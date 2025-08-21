@@ -3,4 +3,17 @@ F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(90,28): warni
 F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(94,27): warning C4305: 'initializing': truncation from 'double' to 'float'
 F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(104,29): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(105,29): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(186,28): warning C4305: 'argument': truncation from 'double' to 'float'
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(188,17): warning C4305: '+=': truncation from 'double' to 'float'
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(196,28): warning C4305: 'initializing': truncation from 'double' to 'float'
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(225,50): warning C4244: 'argument': conversion from 'size_t' to 'float', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(225,21): warning C4244: 'argument': conversion from 'size_t' to 'float', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(229,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(230,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(233,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(258,36): warning C4244: 'argument': conversion from 'size_t' to 'float', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(258,15): warning C4244: 'argument': conversion from 'size_t' to 'float', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(262,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(263,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+F:\Projects\wolfenstein-3d-clone\wolfenstein-3d-clone\src\main.cpp(266,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   wolfenstein-3d-clone.vcxproj -> F:\Projects\wolfenstein-3d-clone\x64\Debug\wolfenstein-3d-clone.exe
