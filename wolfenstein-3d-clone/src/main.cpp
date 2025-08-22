@@ -12,10 +12,14 @@
 #define WINDOW_WIDTH (TILES_COL_NUM * TILE_SIZE)
 #define WINDOW_HEIGHT (TILE_ROW_NUM * TILE_SIZE)
 
-#define MAP_SCALING_FACTOR 1.0f
+#define MAP_SCALING_FACTOR 0.3f
 
-#define MAP_OFFSET_X 0
-#define MAP_OFFSET_Y 0
+#define PI 3.14159265359
+#define TORAD 0.01745329251
+
+float FOV_ANGLE = 60.0f * TORAD;
+#define STRIP_WIDTH 5
+#define NUM_RAYS (WINDOW_WIDTH / STRIP_WIDTH)
 
 //////////////////// Map //////////////////////////////
 
@@ -78,9 +82,6 @@ void DrawOutlinedRect(SDL_Renderer* renderer,
 
 
 //////////////////// Player /////////////////////////////
-
-#define PI 3.14159265359
-#define TORAD 0.01745329251
 
 struct Player
 {
@@ -284,11 +285,13 @@ struct Ray
 
 	void Render(SDL_Renderer* renderer)
 	{
+		/*
 		DrawOutlinedRect(renderer,
 			intersection_x,
 			intersection_y,
 			10.0f, 10.0f,
 			BLUE_COLOR, BLUE_COLOR);
+		*/
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 
@@ -300,6 +303,34 @@ struct Ray
 	}
 };
 Ray ray;
+Ray rays[NUM_RAYS];
+/////////////////////////////////////////////////////////
+
+//////////////////// ColorBuffer ////////////////////////
+uint32_t* color_buffer = nullptr;
+SDL_Texture* color_buffer_texture = nullptr;
+
+void ClearColorBuffer(uint32_t color)
+{
+	for (size_t y = 0; y < WINDOW_HEIGHT; y++)
+	{
+		for (size_t x = 0; x < WINDOW_WIDTH; x++)
+		{
+			color_buffer[(WINDOW_WIDTH * y) + x] = color;
+		}
+	}
+}
+
+void RenderColorBuffer(SDL_Renderer* renderer)
+{
+	SDL_UpdateTexture(
+		color_buffer_texture,
+		nullptr,
+		color_buffer,
+		(int)((uint32_t)WINDOW_WIDTH * sizeof(uint32_t)));
+
+	SDL_RenderTexture(renderer, color_buffer_texture, nullptr, nullptr);
+}
 /////////////////////////////////////////////////////////
 
 
@@ -341,6 +372,16 @@ int main(int argc, char** argv)
 
 	// alpha blending
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+
+	// color buffer
+	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * (uint32_t)WINDOW_WIDTH * (uint32_t)WINDOW_HEIGHT);
+	color_buffer_texture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -423,10 +464,15 @@ int main(int argc, char** argv)
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
 
+		// clear screen
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // black
 		SDL_RenderClear(renderer);
 		
-		
+		// color buffer
+		ClearColorBuffer(0xFF181A19);
+		RenderColorBuffer(renderer);
+
+
 		// draw map
 		for (size_t i = 0; i < TILE_ROW_NUM; i++)
 		{
@@ -435,8 +481,8 @@ int main(int argc, char** argv)
 				auto tile_color = map[i][j] == 1 ? WHITE_COLOR : BLACK_COLOR;
 
 				DrawOutlinedRect(renderer,
-					j * TILE_SIZE * MAP_SCALING_FACTOR + MAP_OFFSET_X,
-					i * TILE_SIZE * MAP_SCALING_FACTOR + MAP_OFFSET_Y,
+					j * TILE_SIZE * MAP_SCALING_FACTOR,
+					i * TILE_SIZE * MAP_SCALING_FACTOR,
 					TILE_SIZE * MAP_SCALING_FACTOR, TILE_SIZE * MAP_SCALING_FACTOR,
 					tile_color, MAP_LINES_COLOR);
 			}
@@ -444,15 +490,42 @@ int main(int argc, char** argv)
 		// draw player
 		player.Render(renderer);
 
+		// cast all rays
+		{
+			float rayAngle = player.rotation_angle - (FOV_ANGLE / 2.0f);
+
+			for (int stripId = 0; stripId < NUM_RAYS; stripId++)
+			{
+				rays[stripId].x = player.x;
+				rays[stripId].y = player.y;
+				rays[stripId].rotation_angle = rayAngle;
+
+				rays[stripId].Cast();
+				rays[stripId].Render(renderer);
+				
+				rayAngle += FOV_ANGLE / NUM_RAYS;
+			}
+		}
+
+		/*
 		ray.x = player.x; ray.y = player.y; ray.rotation_angle = player.rotation_angle;
 		ray.Cast();
 		ray.Render(renderer);
+		*/
+
+		ImGui::Begin("Performance Debug");
+		ImGui::Text("Delta Time: %.4f sec", deltaTime);
+		ImGui::Text("FPS: %.1f", 1.0f / deltaTime);
+		ImGui::End();
 
 		ImGui::Render();
 		ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 		SDL_RenderPresent(renderer);
 	}
 
+	free(color_buffer);
+	SDL_DestroyTexture(color_buffer_texture);
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
