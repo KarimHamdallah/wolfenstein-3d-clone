@@ -205,6 +205,9 @@ struct Ray
 	float intersection_x = 0.0f;
 	float intersection_y = 0.0f;
 
+	bool was_vertical_hit = false;
+
+
 	void Cast()
 	{
 		min_intersection_dist = INFINITY;
@@ -243,6 +246,7 @@ struct Ray
 							min_intersection_dist = dist;
 							intersection_x = hit.x;
 							intersection_y = hit.y;
+							was_vertical_hit = false;
 						}
 					}
 				}
@@ -276,6 +280,7 @@ struct Ray
 							min_intersection_dist = dist;
 							intersection_x = hit.x;
 							intersection_y = hit.y;
+							was_vertical_hit = true;
 						}
 					}
 				}
@@ -351,7 +356,7 @@ void Render3DProjectWalls(SDL_Renderer* renderer)
 
 		for (int y = wallTopPixel; y < wallBottomPixel; y++)
 		{
-			color_buffer[(WINDOW_WIDTH * y) + i] = 0xFFFFFFFF;
+			color_buffer[(WINDOW_WIDTH * y) + i] = rays[i].was_vertical_hit ? 0xFFCCCCCC : 0xFFFFFFFF;
 		}
 	}
 }
