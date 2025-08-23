@@ -18,7 +18,7 @@
 #define TORAD 0.01745329251
 
 float FOV_ANGLE = 60.0f * TORAD;
-#define STRIP_WIDTH 5
+#define STRIP_WIDTH 1
 #define NUM_RAYS (WINDOW_WIDTH / STRIP_WIDTH)
 
 //////////////////// Map //////////////////////////////
@@ -331,6 +331,30 @@ void RenderColorBuffer(SDL_Renderer* renderer)
 
 	SDL_RenderTexture(renderer, color_buffer_texture, nullptr, nullptr);
 }
+
+void Render3DProjectWalls(SDL_Renderer* renderer)
+{
+	for (int i = 0; i < NUM_RAYS; i++)
+	{
+		float ray_distance = rays[i].min_intersection_dist;
+		float corrected_distance = ray_distance * cosf(rays[i].rotation_angle - player.rotation_angle);
+		float distance_proj_plane = (WINDOW_WIDTH / 2) / tan(FOV_ANGLE / 2);
+		float projected_wall_height = (TILE_SIZE / corrected_distance) * distance_proj_plane;
+
+		int wallStripHeight = (int)projected_wall_height;
+
+		int wallTopPixel = (WINDOW_HEIGHT / 2) - (wallStripHeight / 2);
+		wallTopPixel = wallTopPixel < 0 ? 0 : wallTopPixel;
+
+		int wallBottomPixel = (WINDOW_HEIGHT / 2) + (wallStripHeight / 2);
+		wallBottomPixel = wallBottomPixel > WINDOW_HEIGHT ? WINDOW_HEIGHT : wallBottomPixel;
+
+		for (int y = wallTopPixel; y < wallBottomPixel; y++)
+		{
+			color_buffer[(WINDOW_WIDTH * y) + i] = 0xFFFFFFFF;
+		}
+	}
+}
 /////////////////////////////////////////////////////////
 
 
@@ -470,6 +494,7 @@ int main(int argc, char** argv)
 		
 		// color buffer
 		ClearColorBuffer(0xFF181A19);
+		Render3DProjectWalls(renderer);
 		RenderColorBuffer(renderer);
 
 
